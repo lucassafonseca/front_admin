@@ -1,0 +1,38 @@
+/* src/components/Header.css */
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 200px; /* Alinhado à direita da barra de navegação */
+  right: 0;
+  height: 60px;
+  background-color: #f8f9fa;
+  display: flex;
+  justify-content: flex-end; /* Alinha o botão à direita */
+  align-items: center;
+  padding: 0 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 1000; /* Garante que o header fique acima de outros elementos */
+}
+
+.logout-button {
+  background-color: #ff4d4d;
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.3s ease;
+}
+
+.logout-button:hover {
+  background-color: #e60000;
+}
+
+.logout-button .icon {
+  margin-right: 8px; /* Espaço entre o ícone e o texto */
+  font-size: 16px; /* Tamanho do ícone */
+}

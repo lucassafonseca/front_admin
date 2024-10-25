@@ -1,0 +1,45 @@
+/* src/components/Navbar.css */
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 200px;
+  height: 100vh;
+  background-color: #f8f9fa;
+  padding-top: 60px; /* Ajustado para acomodar o Header fixo */
+  box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+}
+
+.nav-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nav-menu li {
+  margin: 15px 0;
+}
+
+.nav-menu a {
+  text-decoration: none;
+  color: #333;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center; /* Alinha o ícone e o texto verticalmente */
+  transition: background-color 0.3s ease;
+}
+
+.nav-menu a:hover {
+  background-color: #e9ecef;
+}
+
+.active {
+  background-color: #ced4da;
+  font-weight: bold;
+}
+
+.icon {
+  margin-right: 10px; /* Espaço entre o ícone e o texto */
+  font-size: 18px; /* Tamanho do ícone */
+}

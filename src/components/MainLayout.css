@@ -1,0 +1,15 @@
+/* src/components/MainLayout.css */
+
+.layout-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.main-content {
+  margin-left: 200px; /* Largura da sidebar */
+  margin-top: 60px; /* Altura do header */
+  padding: 20px;
+  overflow-y: auto;
+  background-color: #f1f1f1;
+}
