@@ -12,6 +12,8 @@ const ItensComponent = () => {
     const [selectedItem, setSelectedItem] = useState(null);
 
     const [itemName, setItemName] = useState('');
+    const [itemDescription, setItemDescription] = useState('');
+    const [itemPrice, setItemPrice] = useState('');
 
     // Função para buscar os itens da API
     const fetchItens = async () => {
@@ -39,6 +41,8 @@ const ItensComponent = () => {
     const showModal = () => {
         setIsEditMode(false);
         setItemName('');
+        setItemDescription('');
+        setItemPrice('');
         setIsModalVisible(true);
     };
 
@@ -46,15 +50,23 @@ const ItensComponent = () => {
         setIsEditMode(true);
         setSelectedItem(item);
         setItemName(item.nome);
+        setItemDescription(item.descricao);
+        setItemPrice(item.preco);
         setIsModalVisible(true);
     };
 
     const handleSave = async () => {
         try {
+            const itemData = {
+                nome: itemName,
+                descricao: itemDescription,
+                preco: itemPrice,
+            };
+
             if (isEditMode && selectedItem) {
-                await axios.put(`http://localhost:8080/api/itens/${selectedItem.id}`, { nome: itemName });
+                await axios.put(`http://localhost:8080/api/itens/${selectedItem.id}`, itemData);
             } else {
-                await axios.post('http://localhost:8080/api/itens', { nome: itemName });
+                await axios.post('http://localhost:8080/api/itens', itemData);
             }
             fetchItens();
             setIsModalVisible(false);
@@ -121,7 +133,7 @@ const ItensComponent = () => {
                 )}
             />
 
-            {/* Modal para Adicionar/Editar */}
+            {/* Modal para Adicionar/Editar Item */}
             <Modal
                 title={isEditMode ? 'Editar Item' : 'Adicionar Item'}
                 visible={isModalVisible}
@@ -133,6 +145,21 @@ const ItensComponent = () => {
                         <Input
                             value={itemName}
                             onChange={(e) => setItemName(e.target.value)}
+                        />
+                    </Form.Item>
+                    <Form.Item label="Descrição">
+                        <Input
+                            value={itemDescription}
+                            onChange={(e) => setItemDescription(e.target.value)}
+                        />
+                    </Form.Item>
+                    <Form.Item label="Preço">
+                        <Input
+                            type="number"
+                            value={itemPrice}
+                            onChange={(e) => setItemPrice(e.target.value)}
+                            min="0"
+                            step="0.01"
                         />
                     </Form.Item>
                 </Form>

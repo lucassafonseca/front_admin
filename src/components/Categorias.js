@@ -1,23 +1,26 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios'; // Para chamadas de API
-import { Modal, Button, Form, Input, List } from 'antd'; // Biblioteca UI, pode ser outra
+import axios from 'axios';
+import { Modal, Button, Form, Input, List, Select } from 'antd';
 import { SearchOutlined, PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 
-const CategoriaComponent = () => {
+const { Option } = Select;
+
+const CategoriasComponent = () => {
     const [categorias, setCategorias] = useState([]);
     const [filteredCategorias, setFilteredCategorias] = useState([]);
+    const [produtos, setProdutos] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [isModalVisible, setIsModalVisible] = useState(false);
-    const [isEditMode, setIsEditMode] = useState(false); // Para saber se estamos editando
-    const [selectedCategoria, setSelectedCategoria] = useState(null); // Categoria a ser editada
+    const [isEditMode, setIsEditMode] = useState(false);
+    const [selectedCategoria, setSelectedCategoria] = useState(null);
 
-    // Dados para o form de adicionar/editar
-    const [categoriaName, setCategoriaName] = useState('');
+    const [categoryName, setCategoryName] = useState('');
+    const [selectedProducts, setSelectedProducts] = useState([]);
 
     // Função para buscar as categorias da API
     const fetchCategorias = async () => {
         try {
-            const response = await axios.get('/api/categorias');
+            const response = await axios.get('http://localhost:8080/api/categorias');
             setCategorias(response.data);
             setFilteredCategorias(response.data);
         } catch (error) {
@@ -25,54 +28,67 @@ const CategoriaComponent = () => {
         }
     };
 
+    // Função para buscar a lista de produtos da API
+    const fetchProdutos = async () => {
+        try {
+            const response = await axios.get('http://localhost:8080/api/produtos');
+            setProdutos(response.data);
+        } catch (error) {
+            console.error('Erro ao buscar produtos:', error);
+        }
+    };
+
     useEffect(() => {
-        fetchCategorias(); // Carrega as categorias ao montar o componente
+        fetchCategorias();
+        fetchProdutos();
     }, []);
 
-    // Função para pesquisar por nome
     const handleSearch = (e) => {
         const value = e.target.value;
         setSearchTerm(value);
         setFilteredCategorias(
-            categorias.filter(categoria => categoria.nome.toLowerCase().includes(value.toLowerCase()))
+            categorias.filter(cat => cat.nome.toLowerCase().includes(value.toLowerCase()))
         );
     };
 
-    // Função para abrir o modal de adicionar categoria
     const showModal = () => {
         setIsEditMode(false);
-        setCategoriaName('');
+        setCategoryName('');
+        setSelectedProducts([]);
         setIsModalVisible(true);
     };
 
-    // Função para abrir o modal de editar categoria
     const showEditModal = (categoria) => {
         setIsEditMode(true);
         setSelectedCategoria(categoria);
-        setCategoriaName(categoria.nome);
+        setCategoryName(categoria.nome);
+        setSelectedProducts(categoria.produtos || []);
         setIsModalVisible(true);
     };
 
-    // Função para adicionar ou editar a categoria
     const handleSave = async () => {
         try {
+            const categoriaData = {
+                nome: categoryName,
+                produtos: selectedProducts,
+            };
+
             if (isEditMode && selectedCategoria) {
-                await axios.put(`/api/categorias/${selectedCategoria.id}`, { nome: categoriaName });
+                await axios.put(`http://localhost:8080/api/categorias/${selectedCategoria.id}`, categoriaData);
             } else {
-                await axios.post('/api/categorias', { nome: categoriaName });
+                await axios.post('http://localhost:8080/api/categorias', categoriaData);
             }
-            fetchCategorias(); // Atualiza as categorias após a operação
-            setIsModalVisible(false); // Fecha o modal
+            fetchCategorias();
+            setIsModalVisible(false);
         } catch (error) {
             console.error('Erro ao salvar a categoria:', error);
         }
     };
 
-    // Função para excluir uma categoria
     const handleDelete = async (id) => {
         try {
-            await axios.delete(`/api/categorias/${id}`);
-            fetchCategorias(); // Atualiza as categorias após excluir
+            await axios.delete(`http://localhost:8080/api/categorias/${id}`);
+            fetchCategorias();
         } catch (error) {
             console.error('Erro ao excluir categoria:', error);
         }
@@ -80,7 +96,7 @@ const CategoriaComponent = () => {
 
     return (
         <div>
-            {/* Barra de pesquisa */}
+            {/* Barra de Pesquisa */}
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
                 <Input
                     placeholder="Buscar categoria"
@@ -137,9 +153,24 @@ const CategoriaComponent = () => {
                 <Form>
                     <Form.Item label="Nome da Categoria">
                         <Input
-                            value={categoriaName}
-                            onChange={(e) => setCategoriaName(e.target.value)}
+                            value={categoryName}
+                            onChange={(e) => setCategoryName(e.target.value)}
                         />
+                    </Form.Item>
+                    <Form.Item label="Produtos Associados">
+                        <Select
+                            mode="multiple"
+                            placeholder="Selecione os produtos"
+                            value={selectedProducts}
+                            onChange={(values) => setSelectedProducts(values)}
+                            style={{ width: '100%' }}
+                        >
+                            {produtos.map((produto) => (
+                                <Option key={produto.id} value={produto.id}>
+                                    {produto.nome}
+                                </Option>
+                            ))}
+                        </Select>
                     </Form.Item>
                 </Form>
             </Modal>
@@ -147,4 +178,4 @@ const CategoriaComponent = () => {
     );
 };
 
-export default CategoriaComponent;
+export default CategoriasComponent;

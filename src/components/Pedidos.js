@@ -1,70 +1,66 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { List, Button } from 'antd';
-import { PrinterOutlined } from '@ant-design/icons';
+import { Button, List, Select } from 'antd';
 
-const PedidosComponent = () => {
-    const [pedidos, setPedidos] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
+const { Option } = Select;
 
-    // Função para buscar os pedidos do backend
-    const fetchPedidos = async () => {
-        setIsLoading(true);
-        try {
-            const response = await axios.get('http://localhost:8080/api/pedidos');
-            setPedidos(response.data);
-        } catch (error) {
-            console.error('Erro ao buscar pedidos:', error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
+const PedidosComponent = ({ fetchPedidos }) => {
+  const [pedidos, setPedidos] = useState([]);
 
-    // Polling para verificar novos pedidos a cada 10 segundos
-    useEffect(() => {
-        fetchPedidos();
-        const interval = setInterval(fetchPedidos, 10000); // 10 segundos
-        return () => clearInterval(interval); // Limpa o intervalo quando o componente desmonta
-    }, []);
+  // Função para buscar pedidos da API
+  const fetchPedidosFromAPI = async () => {
+    try {
+      const response = await axios.get('http://localhost:8080/api/pedidos');
+      setPedidos(response.data);
+    } catch (error) {
+      console.error('Erro ao buscar pedidos:', error);
+    }
+  };
 
-    // Função para imprimir o pedido
-    const handlePrint = (pedido) => {
-        // Aqui você pode personalizar a lógica de impressão
-        // Por exemplo, abrir uma nova janela com o pedido formatado ou gerar um PDF
-        console.log('Imprimindo pedido:', pedido);
-        window.print(); // Simplesmente abre a interface de impressão
-    };
+  // Função para atualizar o status do pedido
+  const updatePedidoStatus = async (pedidoId, newStatus) => {
+    try {
+      await axios.put(`http://localhost:8080/api/pedidos/${pedidoId}`, { status: newStatus });
+      fetchPedidosFromAPI();
+      fetchPedidos(); // Recarrega a lista de pedidos na App.js
+    } catch (error) {
+      console.error('Erro ao atualizar o status do pedido:', error);
+    }
+  };
 
-    return (
-        <div>
-            <h2>Lista de Pedidos</h2>
+  useEffect(() => {
+    fetchPedidosFromAPI();
+  }, []);
 
-            {/* Lista de Pedidos */}
-            <List
-                loading={isLoading}
-                bordered
-                dataSource={pedidos}
-                renderItem={pedido => (
-                    <List.Item
-                        actions={[
-                            <Button
-                                type="primary"
-                                icon={<PrinterOutlined />}
-                                onClick={() => handlePrint(pedido)}
-                            >
-                                Imprimir Nota
-                            </Button>
-                        ]}
-                    >
-                        <List.Item.Meta
-                            title={`Pedido #${pedido.id}`}
-                            description={`Cliente: ${pedido.cliente} | Total: R$${pedido.total}`}
-                        />
-                    </List.Item>
-                )}
-            />
-        </div>
-    );
+  return (
+    <div>
+      <List
+        bordered
+        dataSource={pedidos}
+        renderItem={pedido => (
+          <List.Item
+            actions={[
+              <Select
+                defaultValue={pedido.status}
+                onChange={(value) => updatePedidoStatus(pedido.id, value)}
+                style={{ width: 120 }}
+              >
+                <Option value="Pendente">Pendente</Option>
+                <Option value="Em Preparo">Em Preparo</Option>
+                <Option value="Pronto">Pronto</Option>
+                <Option value="Finalizado">Finalizado</Option>
+              </Select>,
+              <Button type="primary">
+                Imprimir Nota
+              </Button>
+            ]}
+          >
+            Pedido #{pedido.id} - {pedido.nomeCliente}
+          </List.Item>
+        )}
+      />
+    </div>
+  );
 };
 
 export default PedidosComponent;

@@ -1,45 +1,74 @@
 /* src/components/Navbar.css */
-
 .sidebar {
+  width: 200px; /* Diminuído para se alinhar melhor ao Header */
+  height: calc(100% - 60px); /* Para que a altura total não exceda a janela */
+  background-color: #f8f9fa; /* Cor de fundo da navbar */
+  color: #333; /* Cor do texto alterada para um tom escuro */
   position: fixed;
-  top: 0;
+  top: 60px; /* Ajustado para começar abaixo do Header */
   left: 0;
-  width: 200px;
-  height: 100vh;
-  background-color: #f8f9fa;
-  padding-top: 60px; /* Ajustado para acomodar o Header fixo */
-  box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+  padding-top: 20px; /* Mantém espaço entre o topo e os itens do menu */
+  z-index: 999; /* Garante que a barra de navegação esteja acima de outros elementos */
 }
 
 .nav-menu {
   list-style: none;
-  padding: 0;
-  margin: 0;
+  padding-left: 0;
 }
 
 .nav-menu li {
-  margin: 15px 0;
+  margin-bottom: 10px; /* Diminuído para reduzir o espaço entre os itens */
 }
 
-.nav-menu a {
+.nav-menu li a {
   text-decoration: none;
-  color: #333;
-  padding: 10px 20px;
+  color: #333; /* Cor do texto alterada para um tom escuro */
   display: flex;
-  align-items: center; /* Alinha o ícone e o texto verticalmente */
-  transition: background-color 0.3s ease;
+  align-items: center;
+  padding: 10px;
+  border-radius: 4px; /* Bordas arredondadas para um efeito mais suave */
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.nav-menu a:hover {
-  background-color: #e9ecef;
+.nav-menu li a.active {
+  background-color: #444; /* Cor de fundo do item ativo */
+  color: white; /* Texto branco quando ativo */
 }
 
-.active {
-  background-color: #ced4da;
-  font-weight: bold;
+.nav-menu li a.active .icon {
+  color: white; /* Ícone branco quando o item está ativo */
+}
+
+/* Hover sem alterar a cor do texto e ícone ativo */
+.nav-menu li a:hover {
+  background-color: #e6e6e6; /* Cor de fundo ao passar o mouse */
+  color: #333; /* Mantém o texto escuro ao passar o mouse */
+}
+
+.nav-menu li a:hover .icon {
+  color: #333; /* Ícone escuro quando hover */
 }
 
 .icon {
-  margin-right: 10px; /* Espaço entre o ícone e o texto */
-  font-size: 18px; /* Tamanho do ícone */
+  margin-right: 10px;
+  color: #333; /* Cor dos ícones alterada para um tom escuro */
+  transition: color 0.3s ease; /* Transição suave para a mudança de cor do ícone */
+}
+
+.pedido-container {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.pedido-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: bold;
 }

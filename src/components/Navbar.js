@@ -1,10 +1,17 @@
 // src/components/Navbar.js
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { FaHome, FaShoppingCart, FaBoxOpen, FaTags, FaList } from 'react-icons/fa'; // Importando os ícones do Font Awesome
 import './Navbar.css'; // Importando o arquivo CSS do Navbar
 
-function Navbar() {
+function Navbar({ unattendedCount }) {
+  const [newOrders, setNewOrders] = useState(unattendedCount);
+
+  // Atualiza o contador de pedidos não atendidos (se necessário)
+  useEffect(() => {
+    setNewOrders(unattendedCount);
+  }, [unattendedCount]);
+
   return (
     <nav className="sidebar">
       <ul className="nav-menu">
@@ -15,7 +22,12 @@ function Navbar() {
         </li>
         <li>
           <NavLink to="/pedidos" className={({ isActive }) => isActive ? 'active' : ''}>
-            <FaShoppingCart className="icon" /> Pedidos
+            <div className="pedido-container">
+              <FaShoppingCart className="icon" /> Pedidos
+              {newOrders > 0 && (
+                <div className="pedido-badge">{newOrders}</div> // Badge que exibe o contador de pedidos não atendidos
+              )}
+            </div>
           </NavLink>
         </li>
         <li>
