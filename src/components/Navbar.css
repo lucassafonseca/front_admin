@@ -9,6 +9,7 @@
   left: 0;
   padding-top: 20px; /* Mantém espaço entre o topo e os itens do menu */
   z-index: 999; /* Garante que a barra de navegação esteja acima de outros elementos */
+  box-shadow: 4px 0 8px rgba(0, 0, 0, 0.1); /* Somente sombra à direita */
 }
 
 .nav-menu {

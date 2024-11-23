@@ -1,0 +1,12 @@
+/* src/components/LeftSpacer.css */
+
+/* Estilos para o LeftSpacer */
+.left-spacer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 200px;  /* Largura do espaço à esquerda */
+  height: 100px; /* Altura de 100% da tela */
+  background-color: #f8f9fa;  /* Cor de fundo (pode ser alterada para #2f3d48 ou outra) */
+  z-index: 998;  /* Garante que fique acima de outros elementos */
+}

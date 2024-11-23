@@ -11,7 +11,7 @@
   justify-content: flex-end; /* Alinha o botão à direita */
   align-items: center;
   padding: 0 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Somente sombra inferior */
   z-index: 1000; /* Garante que o header fique acima de outros elementos */
 }
 

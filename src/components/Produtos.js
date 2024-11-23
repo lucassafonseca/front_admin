@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Modal, Button, Form, Input, List } from 'antd';
-import { SearchOutlined, PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Modal, Button, Form, Input, List, Select, Upload } from 'antd';
+import { SearchOutlined, PlusOutlined, EditOutlined, DeleteOutlined, UploadOutlined } from '@ant-design/icons';
+
+const { Option } = Select;
 
 const ProdutosComponent = () => {
     const [produtos, setProdutos] = useState([]);
@@ -10,10 +12,14 @@ const ProdutosComponent = () => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
     const [selectedProduto, setSelectedProduto] = useState(null);
-
     const [produtoName, setProdutoName] = useState('');
+    const [descricao, setDescricao] = useState('');
+    const [preco, setPreco] = useState('');
+    const [selectedItens, setSelectedItens] = useState([]);
+    const [imagem, setImagem] = useState(null);
+    const [itensDisponiveis, setItensDisponiveis] = useState([]); // Lista de itens disponíveis
 
-    // Função para buscar os produtos da API
+    // Função para buscar produtos
     const fetchProdutos = async () => {
         try {
             const response = await axios.get('http://localhost:8080/api/produtos');
@@ -24,8 +30,19 @@ const ProdutosComponent = () => {
         }
     };
 
+    // Função para buscar itens adicionais disponíveis
+    const fetchItensDisponiveis = async () => {
+        try {
+            const response = await axios.get('http://localhost:8080/api/itens');
+            setItensDisponiveis(response.data);
+        } catch (error) {
+            console.error('Erro ao buscar itens adicionais:', error);
+        }
+    };
+
     useEffect(() => {
         fetchProdutos();
+        fetchItensDisponiveis();
     }, []);
 
     const handleSearch = (e) => {
@@ -39,6 +56,10 @@ const ProdutosComponent = () => {
     const showModal = () => {
         setIsEditMode(false);
         setProdutoName('');
+        setDescricao('');
+        setPreco('');
+        setSelectedItens([]);
+        setImagem(null);
         setIsModalVisible(true);
     };
 
@@ -46,15 +67,27 @@ const ProdutosComponent = () => {
         setIsEditMode(true);
         setSelectedProduto(produto);
         setProdutoName(produto.nome);
+        setDescricao(produto.descricao);
+        setPreco(produto.preco);
+        setSelectedItens(produto.itens || []);
+        setImagem(produto.imagem || null);
         setIsModalVisible(true);
     };
 
     const handleSave = async () => {
         try {
+            const produtoData = {
+                nome: produtoName,
+                descricao,
+                preco,
+                itens: selectedItens,
+                imagem,
+            };
+
             if (isEditMode && selectedProduto) {
-                await axios.put(`http://localhost:8080/api/produtos/${selectedProduto.id}`, { nome: produtoName });
+                await axios.put(`http://localhost:8080/api/produtos/${selectedProduto.id}`, produtoData);
             } else {
-                await axios.post('http://localhost:8080/api/produtos', { nome: produtoName });
+                await axios.post('http://localhost:8080/api/produtos', produtoData);
             }
             fetchProdutos();
             setIsModalVisible(false);
@@ -72,9 +105,14 @@ const ProdutosComponent = () => {
         }
     };
 
+    const handleFileChange = (info) => {
+        if (info.file.status === 'done') {
+            setImagem(info.file.response.url); // URL do upload, ajuste conforme necessário
+        }
+    };
+
     return (
         <div>
-            {/* Barra de Pesquisa */}
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
                 <Input
                     placeholder="Buscar produto"
@@ -92,7 +130,6 @@ const ProdutosComponent = () => {
                 </Button>
             </div>
 
-            {/* Lista de Produtos */}
             <List
                 bordered
                 dataSource={filteredProdutos}
@@ -121,19 +158,55 @@ const ProdutosComponent = () => {
                 )}
             />
 
-            {/* Modal para Adicionar/Editar */}
             <Modal
                 title={isEditMode ? 'Editar Produto' : 'Adicionar Produto'}
                 visible={isModalVisible}
                 onOk={handleSave}
                 onCancel={() => setIsModalVisible(false)}
             >
-                <Form>
+                <Form layout="vertical">
                     <Form.Item label="Nome do Produto">
                         <Input
                             value={produtoName}
                             onChange={(e) => setProdutoName(e.target.value)}
                         />
+                    </Form.Item>
+                    <Form.Item label="Descrição">
+                        <Input.TextArea
+                            value={descricao}
+                            onChange={(e) => setDescricao(e.target.value)}
+                        />
+                    </Form.Item>
+                    <Form.Item label="Preço">
+                        <Input
+                            type="number"
+                            value={preco}
+                            onChange={(e) => setPreco(e.target.value)}
+                        />
+                    </Form.Item>
+                    <Form.Item label="Itens Adicionais">
+                        <Select
+                            mode="multiple"
+                            placeholder="Selecione os itens adicionais"
+                            value={selectedItens}
+                            onChange={(value) => setSelectedItens(value)}
+                            style={{ width: '100%' }}
+                        >
+                            {itensDisponiveis.map(item => (
+                                <Option key={item.id} value={item.id}>
+                                    {item.nome}
+                                </Option>
+                            ))}
+                        </Select>
+                    </Form.Item>
+                    <Form.Item label="Imagem">
+                        <Upload
+                            name="file"
+                            listType="picture"
+                            onChange={handleFileChange}
+                        >
+                            <Button icon={<UploadOutlined />}>Upload</Button>
+                        </Upload>
                     </Form.Item>
                 </Form>
             </Modal>
